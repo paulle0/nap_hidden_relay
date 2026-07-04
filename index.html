@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NNS Hidden Relay</title>
+  <link rel="icon" href="assets/nns.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script src="lib/nostr-tools.js"></script>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <img src="assets/nns.svg" alt="NNS" class="topbar__logo">
+    <span class="topbar__title">NNS Hidden Relay</span>
+    <div class="topbar__spacer"></div>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">🌙</button>
+  </header>
+
+  <main class="shell">
+
+    <!-- Identity card -->
+    <section class="card">
+      <div class="card__header">
+        <h2>Relay Identity</h2>
+      </div>
+      <div class="card__body">
+        <div class="field">
+          <label>Public Key (hex)</label>
+          <div class="row">
+            <code id="pubkey-display" style="
+              flex:1; font-family:var(--font-mono); font-size:0.78rem;
+              color:var(--text-secondary); word-break:break-all;
+              padding:8px 12px; background:var(--bg-inset);
+              border-radius:var(--radius-sm); min-height:36px;
+            ">No identity yet</code>
+            <button class="btn btn--primary btn--sm" id="btn-generate-key">Generate</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Rendezvous Relay</label>
+          <input type="text" id="relay-url" placeholder="wss://nos.lol">
+        </div>
+      </div>
+    </section>
+
+    <!-- Controls card -->
+    <section class="card">
+      <div class="card__header">
+        <h2>Relay Control</h2>
+        <div class="topbar__spacer"></div>
+        <div id="status-banner" class="status-banner status-banner--off">
+          <span id="status-dot" class="status-dot"></span>
+          <span id="status-text">Stopped</span>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="row" style="gap:var(--space-md)">
+          <button class="btn btn--primary" id="btn-start">▶ Start Relay</button>
+          <button class="btn btn--danger" id="btn-stop" disabled>■ Stop Relay</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Whitelist card -->
+    <section class="card">
+      <div class="card__header">
+        <h2>Pubkey Whitelist</h2>
+      </div>
+      <div class="card__body">
+        <div class="field">
+          <label>Add pubkey (64-char hex)</label>
+          <div class="row">
+            <input type="text" id="whitelist-input"
+                   placeholder="e.g. a1b2c3d4…" style="flex:1">
+            <button class="btn btn--primary btn--sm" id="whitelist-add">Add</button>
+          </div>
+        </div>
+        <div id="chip-list" class="chip-list"></div>
+      </div>
+    </section>
+
+    <!-- Events card -->
+    <section class="card">
+      <div class="card__header">
+        <h2>Stored Events</h2>
+        <span style="font-size:0.78rem;color:var(--text-tertiary);margin-left:4px"
+              id="event-count">0</span>
+        <div class="topbar__spacer"></div>
+        <button class="btn btn--ghost btn--sm" id="btn-clear-events">Clear All</button>
+      </div>
+      <div class="card__body" style="padding:0">
+        <div id="event-list" class="event-list">
+          <div class="event-list__empty">No stored events yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Log card -->
+    <section class="card">
+      <div class="card__header">
+        <h2>Activity Log</h2>
+      </div>
+      <div class="card__body">
+        <div id="log-area" class="log-area"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Event detail modal -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="row row--between" style="margin-bottom:var(--space-md)">
+        <span></span>
+        <button class="btn btn--ghost btn--sm" id="modal-close">✕ Close</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

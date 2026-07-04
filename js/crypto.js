@@ -106,8 +106,9 @@ export function nrvrelayEncode(hexPubkey, relayUrls) {
     3: [new Uint8Array(kindBuf)],
   });
 
-  const words = NT.utils.bech32.toWords(data);
-  return NT.utils.bech32.encode('nrvrelay', words, 5000);
+  // NT.nip19.encodeBytes calls the internal bech32.toWords + bech32.encode
+  // (bech32 is not directly exported by nostr-tools)
+  return NT.nip19.encodeBytes('nrvrelay', data);
 }
 
 // ——— Persistence ——— //

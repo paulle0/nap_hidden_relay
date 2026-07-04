@@ -131,6 +131,14 @@ body {
 
 a { color: var(--accent-light); }
 
+/* ——— App screen layout ——— */
+#app-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+#app-screen > .shell { flex: 1; }
+
 /* ——— Footer ——— */
 .app-footer {
   text-align: center;

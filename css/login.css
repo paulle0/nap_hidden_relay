@@ -8,6 +8,9 @@
   justify-content: center;
   padding: var(--space-lg);
 }
+.login-screen > .app-footer {
+  margin-top: auto;
+}
 
 .login-card {
   background: var(--bg-surface);

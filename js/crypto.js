@@ -61,7 +61,7 @@ export function signEvent(sk, t) {
 
 /**
  * NIP-44 encrypt.
- * @param {Uint8Array} sk        — our secret key
+ * @param {Uint8Array} sk              — our secret key
  * @param {string}     recipientPubkey — hex pubkey of recipient
  * @param {string}     plaintext
  * @returns {string} ciphertext
@@ -73,7 +73,7 @@ export function nip44Encrypt(sk, recipientPubkey, plaintext) {
 
 /**
  * NIP-44 decrypt.
- * @param {Uint8Array} sk          — our secret key
+ * @param {Uint8Array} sk           — our secret key
  * @param {string}     senderPubkey — hex pubkey of sender
  * @param {string}     ciphertext
  * @returns {string} plaintext
@@ -84,25 +84,12 @@ export function nip44Decrypt(sk, senderPubkey, ciphertext) {
 }
 
 /**
- * NIP-04 encrypt (fallback for wider client support).
- */
-export async function nip04Encrypt(sk, recipientPubkey, plaintext) {
-  return NT.nip04.encrypt(sk, recipientPubkey, plaintext);
-}
-
-/**
- * NIP-04 decrypt.
- */
-export async function nip04Decrypt(sk, senderPubkey, ciphertext) {
-  return NT.nip04.decrypt(sk, senderPubkey, ciphertext);
-}
-
-/**
- * Verify an event's id and signature.
+ * Verify an event's id hash and schnorr signature.
+ * @param {object} event — a signed Nostr event
+ * @returns {boolean}
  */
 export function verifyEvent(event) {
   try {
-    // nostr-tools verifyEvent checks id hash + schnorr sig
     return NT.verifyEvent ? NT.verifyEvent(event) : true;
   } catch {
     return false;

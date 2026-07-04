@@ -7,7 +7,11 @@ import * as storage from './storage.js';
 import * as log from './logger.js';
 import { RelayConnection } from './relay-connection.js';
 import { RelayHandler } from './relay-handler.js';
-import { el, setStatus, appendLog, renderEvents, renderWhitelist, setTheme, initModal } from './ui.js';
+import { publishRelayList, publishRelayInfo } from './announcer.js';
+import {
+  el, setStatus, appendLog, renderEvents,
+  renderWhitelist, setTheme, initModal,
+} from './ui.js';
 
 let connection = null;
 let handler = null;
@@ -32,7 +36,8 @@ function initTheme() {
   const saved = localStorage.getItem(STORAGE_KEY.THEME) || 'dark';
   setTheme(saved);
   el.themeToggle.addEventListener('click', () => {
-    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    const next = document.documentElement.getAttribute('data-theme') === 'dark'
+      ? 'light' : 'dark';
     setTheme(next);
     localStorage.setItem(STORAGE_KEY.THEME, next);
   });
@@ -41,11 +46,12 @@ function initTheme() {
 // ——— Key management ——— //
 function initKeys() {
   secretKey = crypto.loadSecretKey();
-  if (secretKey) {
-    showPubkey();
-  }
+  if (secretKey) showPubkey();
+
   el.generateKeyBtn.addEventListener('click', () => {
-    if (secretKey && !confirm('This will replace your current relay identity. Continue?')) return;
+    if (secretKey && !confirm('This will replace your current relay identity. Continue?')) {
+      return;
+    }
     secretKey = crypto.generateSecretKey();
     crypto.saveSecretKey(secretKey);
     showPubkey();
@@ -132,7 +138,7 @@ function startRelay() {
   handler = new RelayHandler(
     secretKey,
     (event) => connection.publish(event),
-    () => renderEvents()
+    () => renderEvents(),
   );
   handler.setWhitelist(whitelist);
 
@@ -146,10 +152,14 @@ function startRelay() {
         setStatus('on', 'Running');
         el.startBtn.disabled = true;
         el.stopBtn.disabled = false;
+        // Announce this relay on the rendezvous relay (NNS NIP §10112/10113)
+        publishRelayList(secretKey, url, (ev) => connection.publish(ev));
+        publishRelayInfo(secretKey, (ev) => connection.publish(ev));
         break;
       case 'closed':
       case 'error':
-        setStatus(status === 'error' ? 'error' : 'off', status === 'error' ? 'Error' : 'Disconnected');
+        setStatus(status === 'error' ? 'error' : 'off',
+          status === 'error' ? 'Error' : 'Disconnected');
         break;
     }
   });

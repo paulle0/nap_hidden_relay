@@ -3,113 +3,184 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6d28d9">
   <title>NNS Hidden Relay</title>
   <link rel="icon" href="assets/nns.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/login.css">
   <script src="lib/nostr-tools.js"></script>
 </head>
 <body>
 
-  <!-- Top bar -->
-  <header class="topbar">
-    <img src="assets/nns.svg" alt="NNS" class="topbar__logo">
-    <span class="topbar__title">NNS Hidden Relay</span>
-    <div class="topbar__spacer"></div>
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">🌙</button>
-  </header>
+  <!-- ============ LOGIN SCREEN ============ -->
+  <div id="login-screen" class="login-screen hidden">
+    <button class="theme-toggle login-theme-toggle" id="login-theme-toggle" title="Toggle theme">☀</button>
 
-  <main class="shell">
-
-    <!-- Identity card -->
-    <section class="card">
-      <div class="card__header">
-        <h2>Relay Identity</h2>
+    <div class="login-card">
+      <div class="login-card__header">
+        <img src="assets/nns.svg" alt="NNS" class="login-card__logo">
+        <div class="login-card__title">NNS Hidden Relay</div>
+        <div class="login-card__subtitle">
+          A browser-based virtual relay for the Nostr Network Stack.
+          Import an existing identity or generate a new one.
+        </div>
       </div>
-      <div class="card__body">
-        <div class="field">
-          <label>Public Key (hex)</label>
-          <div class="row">
-            <code id="pubkey-display" style="
-              flex:1; font-family:var(--font-mono); font-size:0.78rem;
-              color:var(--text-secondary); word-break:break-all;
-              padding:8px 12px; background:var(--bg-inset);
-              border-radius:var(--radius-sm); min-height:36px;
-            ">No identity yet</code>
-            <button class="btn btn--primary btn--sm" id="btn-generate-key">Generate</button>
+
+      <!-- nsec import -->
+      <div class="login-section-label">Login with nsec</div>
+      <div class="field" style="margin-bottom:var(--space-sm)">
+        <div class="row">
+          <input type="password" id="login-nsec" placeholder="nsec1…" style="flex:1">
+          <button class="btn btn--primary btn--sm" id="btn-login-import">Login</button>
+        </div>
+      </div>
+
+      <div class="login-divider">or</div>
+
+      <button class="btn btn--primary" id="btn-login-generate" style="width:100%">
+        Generate New Identity
+      </button>
+
+      <!-- Rendezvous relays -->
+      <div class="login-divider">rendezvous relays</div>
+      <div class="field" style="margin-bottom:var(--space-sm)">
+        <div class="row">
+          <input type="text" id="login-relay-input" placeholder="wss://nos.lol" style="flex:1">
+          <button class="btn btn--ghost btn--sm" id="btn-login-relay-add">Add</button>
+        </div>
+      </div>
+      <div id="login-relay-list" class="chip-list"></div>
+
+      <div id="login-error" class="login-error hidden"></div>
+
+      <div class="login-links">
+        <a href="https://github.com/niccoloAldini/nostr_network_stack_nip" target="_blank">nns nip</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/nostr-protocol/nips" target="_blank">nostr protocol</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN APP ============ -->
+  <div id="app-screen" class="hidden">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <img src="assets/nns.svg" alt="NNS" class="topbar__logo">
+      <span class="topbar__title">NNS Hidden Relay</span>
+      <div class="topbar__spacer"></div>
+      <button class="btn btn--ghost btn--sm" id="btn-logout">Logout</button>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle theme">☀</button>
+    </header>
+
+    <main class="shell">
+
+      <!-- Identity card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Relay Identity</h2>
+        </div>
+        <div class="card__body">
+          <div class="field">
+            <label>Public Key (hex)</label>
+            <div id="pubkey-display" class="identity-value">—</div>
+          </div>
+          <div class="field">
+            <label>npub</label>
+            <div id="npub-display" class="identity-value">—</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>nsec (keep secret!)</label>
+            <div id="nsec-display" class="identity-value"
+                 style="filter:blur(4px); cursor:pointer"
+                 onclick="this.style.filter = this.style.filter ? '' : 'blur(4px)'">—</div>
           </div>
         </div>
-        <div class="field">
-          <label>Rendezvous Relay</label>
-          <input type="text" id="relay-url" placeholder="wss://nos.lol">
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Controls card -->
-    <section class="card">
-      <div class="card__header">
-        <h2>Relay Control</h2>
-        <div class="topbar__spacer"></div>
-        <div id="status-banner" class="status-banner status-banner--off">
-          <span id="status-dot" class="status-dot"></span>
-          <span id="status-text">Stopped</span>
+      <!-- Rendezvous relays card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Rendezvous Relays</h2>
         </div>
-      </div>
-      <div class="card__body">
-        <div class="row" style="gap:var(--space-md)">
-          <button class="btn btn--primary" id="btn-start">▶ Start Relay</button>
-          <button class="btn btn--danger" id="btn-stop" disabled>■ Stop Relay</button>
+        <div class="card__body">
+          <div class="field" style="margin-bottom:var(--space-sm)">
+            <label>Add relay</label>
+            <div class="row">
+              <input type="text" id="relay-input" placeholder="wss://relay.example.com" style="flex:1">
+              <button class="btn btn--primary btn--sm" id="btn-relay-add">Add</button>
+            </div>
+          </div>
+          <div id="relay-chip-list" class="chip-list"></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Whitelist card -->
-    <section class="card">
-      <div class="card__header">
-        <h2>Pubkey Whitelist</h2>
-      </div>
-      <div class="card__body">
-        <div class="field">
-          <label>Add pubkey (64-char hex)</label>
-          <div class="row">
-            <input type="text" id="whitelist-input"
-                   placeholder="e.g. a1b2c3d4…" style="flex:1">
-            <button class="btn btn--primary btn--sm" id="whitelist-add">Add</button>
+      <!-- Controls card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Relay Control</h2>
+          <div class="topbar__spacer"></div>
+          <div id="status-banner" class="status-banner status-banner--off">
+            <span id="status-dot" class="status-dot"></span>
+            <span id="status-text">Stopped</span>
           </div>
         </div>
-        <div id="chip-list" class="chip-list"></div>
-      </div>
-    </section>
-
-    <!-- Events card -->
-    <section class="card">
-      <div class="card__header">
-        <h2>Stored Events</h2>
-        <span style="font-size:0.78rem;color:var(--text-tertiary);margin-left:4px"
-              id="event-count">0</span>
-        <div class="topbar__spacer"></div>
-        <button class="btn btn--ghost btn--sm" id="btn-clear-events">Clear All</button>
-      </div>
-      <div class="card__body" style="padding:0">
-        <div id="event-list" class="event-list">
-          <div class="event-list__empty">No stored events yet.</div>
+        <div class="card__body">
+          <div class="row" style="gap:var(--space-md)">
+            <button class="btn btn--primary" id="btn-start">▶ Start Relay</button>
+            <button class="btn btn--danger" id="btn-stop" disabled>■ Stop Relay</button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Log card -->
-    <section class="card">
-      <div class="card__header">
-        <h2>Activity Log</h2>
-      </div>
-      <div class="card__body">
-        <div id="log-area" class="log-area"></div>
-      </div>
-    </section>
+      <!-- Whitelist card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Pubkey Whitelist</h2>
+        </div>
+        <div class="card__body">
+          <div class="field">
+            <label>Add pubkey (hex or npub1…)</label>
+            <div class="row">
+              <input type="text" id="whitelist-input"
+                     placeholder="npub1… or 64-char hex" style="flex:1">
+              <button class="btn btn--primary btn--sm" id="whitelist-add">Add</button>
+            </div>
+          </div>
+          <div id="chip-list" class="chip-list"></div>
+        </div>
+      </section>
 
-  </main>
+      <!-- Events card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Stored Events</h2>
+          <span style="font-size:0.78rem;color:var(--text-tertiary);margin-left:4px"
+                id="event-count">0</span>
+          <div class="topbar__spacer"></div>
+          <button class="btn btn--ghost btn--sm" id="btn-clear-events">Clear All</button>
+        </div>
+        <div class="card__body" style="padding:0">
+          <div id="event-list" class="event-list">
+            <div class="event-list__empty">No stored events yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Log card -->
+      <section class="card">
+        <div class="card__header">
+          <h2>Activity Log</h2>
+        </div>
+        <div class="card__body">
+          <div id="log-area" class="log-area"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
 
   <!-- Event detail modal -->
   <div class="modal-backdrop" id="modal-backdrop">

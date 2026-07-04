@@ -1,0 +1,196 @@
+/* NNS Hidden Relay — Component Styles */
+
+/* ——— Status indicator ——— */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+}
+.status-dot--active {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.status-banner--off  { background: var(--bg-inset); color: var(--text-tertiary); }
+.status-banner--on   { background: var(--green-dim); color: var(--green); }
+.status-banner--err  { background: var(--red-dim); color: var(--red); }
+
+/* ——— Form fields ——— */
+.field { margin-bottom: var(--space-md); }
+
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color var(--duration) var(--ease);
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--accent);
+}
+
+/* ——— Pubkey / whitelist chips ——— */
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  min-height: 28px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--accent-subtle);
+  color: var(--accent-light);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip__remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.6;
+}
+.chip__remove:hover { opacity: 1; }
+
+/* ——— Event log table ——— */
+.event-list {
+  font-size: 0.8rem;
+}
+
+.event-list__empty {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-tertiary);
+}
+
+.event-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 90px 50px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: center;
+}
+.event-row:last-child { border-bottom: none; }
+
+.event-row__kind {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent-light);
+}
+
+.event-row__pubkey {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-row__time {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.event-row__actions {
+  text-align: right;
+}
+
+/* ——— Log console ——— */
+.log-area {
+  background: var(--bg-inset);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  max-height: 180px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.log-area .log--info { color: var(--accent-light); }
+.log-area .log--ok   { color: var(--green); }
+.log-area .log--err  { color: var(--red); }
+
+/* ——— Inline row layout ——— */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.row--between { justify-content: space-between; }
+.row--wrap { flex-wrap: wrap; }
+
+/* ——— Modal / detail overlay ——— */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-popup);
+  max-width: 560px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+.modal pre {
+  background: var(--bg-inset); padding: var(--space-md);
+  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.75rem;
+  overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+  color: var(--text-secondary); margin-top: var(--space-sm);
+}

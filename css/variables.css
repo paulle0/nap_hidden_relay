@@ -1,0 +1,68 @@
+/* NNS Hidden Relay — Design Tokens */
+
+:root {
+  /* Purple accent palette */
+  --accent: #6d28d9;
+  --accent-light: #8b5cf6;
+  --accent-dim: #4c1d95;
+  --accent-subtle: rgba(109, 40, 217, 0.12);
+
+  /* Status */
+  --green: #22c55e;
+  --green-dim: rgba(34, 197, 94, 0.15);
+  --red: #ef4444;
+  --red-dim: rgba(239, 68, 68, 0.15);
+  --amber: #f59e0b;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  /* Sizing */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration: 200ms;
+}
+
+/* ——— Light theme (default) ——— */
+[data-theme="light"] {
+  --bg-root: #f8f7f4;
+  --bg-surface: #ffffff;
+  --bg-inset: #f1f0ed;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --border: #e2e0db;
+  --border-subtle: #ebe9e5;
+  --text-primary: #1a1817;
+  --text-secondary: #6b6560;
+  --text-tertiary: #9c9790;
+  --text-on-accent: #ffffff;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-popup: 0 8px 24px rgba(0,0,0,0.12);
+  --logo-filter: none;
+}
+
+/* ——— Dark theme ——— */
+[data-theme="dark"] {
+  --bg-root: #0f0e0d;
+  --bg-surface: #1a1918;
+  --bg-inset: #242220;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --border: #2e2c2a;
+  --border-subtle: #242220;
+  --text-primary: #ece9e4;
+  --text-secondary: #9c9790;
+  --text-tertiary: #6b6560;
+  --text-on-accent: #ffffff;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-popup: 0 8px 24px rgba(0,0,0,0.5);
+  --logo-filter: brightness(1.4);
+}

@@ -1,0 +1,130 @@
+/* NNS Hidden Relay — Base Styles */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-root);
+  color: var(--text-primary);
+  line-height: 1.55;
+  min-height: 100vh;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+
+/* ——— Top bar ——— */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.topbar__logo {
+  width: 32px;
+  height: 32px;
+  filter: var(--logo-filter);
+}
+
+.topbar__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.topbar__spacer { flex: 1; }
+
+/* ——— Theme toggle ——— */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  transition: border-color var(--duration) var(--ease);
+}
+.theme-toggle:hover { border-color: var(--accent-light); }
+
+/* ——— Layout shell ——— */
+.shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ——— Cards ——— */
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card__header h2 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.card__body {
+  padding: var(--space-lg);
+}
+
+/* ——— Buttons ——— */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.87rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+.btn--primary:hover { background: var(--accent-light); }
+
+.btn--danger {
+  background: var(--red);
+  color: #fff;
+}
+.btn--danger:hover { opacity: 0.85; }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn--ghost:hover { border-color: var(--accent-light); color: var(--accent-light); }
+
+.btn--sm { padding: 5px 12px; font-size: 0.8rem; }
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

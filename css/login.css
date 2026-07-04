@@ -1,0 +1,100 @@
+/* NNS Hidden Relay — Login Screen */
+
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.login-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  max-width: 480px;
+  width: 100%;
+  padding: var(--space-xl);
+}
+
+.login-card__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+.login-card__logo {
+  width: 64px;
+  height: 64px;
+  filter: var(--logo-filter);
+}
+
+.login-card__title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.login-card__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  max-width: 320px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.login-section-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-sm);
+}
+
+.login-error {
+  font-size: 0.8rem;
+  color: var(--red);
+  margin-top: var(--space-sm);
+  min-height: 1.2em;
+}
+
+.login-links {
+  margin-top: var(--space-lg);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+.login-links a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.login-theme-toggle {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-lg);
+}

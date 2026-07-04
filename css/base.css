@@ -13,6 +13,8 @@ body {
   transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
 }
 
+.hidden { display: none !important; }
+
 /* ——— Top bar ——— */
 .topbar {
   display: flex;
@@ -128,3 +130,16 @@ body {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ——— Utility ——— */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+a { color: var(--accent-light); }

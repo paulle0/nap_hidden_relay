@@ -33,7 +33,7 @@
   --duration: 200ms;
 }
 
-/* ——— Light theme (default) ——— */
+/* ——— Light theme ——— */
 [data-theme="light"] {
   --bg-root: #f8f7f4;
   --bg-surface: #ffffff;

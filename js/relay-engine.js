@@ -1,13 +1,15 @@
-// js/relay-engine.js — Start/stop relay engine (pool + handler + announcer)
+// js/relay-engine.js — Start/stop relay engine (pool + handler + announcer + keyring)
 import { STORAGE_KEY } from './config.js';
 import * as crypto from './crypto.js';
 import * as log from './logger.js';
 import { RelayPool } from './relay-pool.js';
 import { RelayHandler } from './relay-handler.js';
+import { KeyringResolver } from './keyring.js';
 import { publishRelayList, publishRelayInfo } from './announcer.js';
 
 let pool = null;
 let handler = null;
+let keyring = null;
 
 export function isRunning() { return pool !== null; }
 
@@ -18,8 +20,18 @@ export function startRelay(secretKey, relayUrls, whitelist, { onStatus, onStoreU
 
   const pk = crypto.getPublicKey(secretKey);
   pool = new RelayPool();
-  handler = new RelayHandler(secretKey, (ev) => pool.publish(ev), onStoreUpdate);
-  handler.setWhitelist(whitelist);
+  handler = new RelayHandler(secretKey, (ev) => pool.publish(ev), () => {
+    if (onStoreUpdate) onStoreUpdate();
+    // Re-scan keyring after new events are stored
+    if (keyring) keyring.refresh();
+  });
+
+  // Set up keyring resolver — reads from local IndexedDB
+  keyring = new KeyringResolver();
+  keyring.onUpdate((effectiveSet) => {
+    handler.setWhitelist(effectiveSet);
+  });
+  keyring.setMasterKeys(whitelist);
 
   let announced = false;
   const publishFn = (ev) => pool.publish(ev);
@@ -33,6 +45,7 @@ export function startRelay(secretKey, relayUrls, whitelist, { onStatus, onStoreU
         announced = true;
         publishRelayList(secretKey, relayUrls, publishFn);
         publishRelayInfo(secretKey, publishFn);
+        keyring.startPolling();
       }
     } else if (status === 'error') {
       if (onStatus) onStatus('error', 'Connection error');
@@ -45,14 +58,13 @@ export function startRelay(secretKey, relayUrls, whitelist, { onStatus, onStoreU
 }
 
 export function stopRelay() {
-  if (pool) {
-    pool.disconnectAll();
-    pool = null;
-  }
+  if (keyring) { keyring.stopPolling(); keyring = null; }
+  if (pool) { pool.disconnectAll(); pool = null; }
   handler = null;
   log.info('Relay stopped.');
 }
 
 export function updateWhitelist(whitelist) {
-  if (handler) handler.setWhitelist(whitelist);
+  if (keyring) keyring.setMasterKeys(whitelist);
+  else if (handler) handler.setWhitelist(new Set(whitelist));
 }

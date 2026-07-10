@@ -7,9 +7,10 @@ export const DEFAULTS = {
 };
 
 export const KIND = {
-  RELAY_LIST:  10112,
-  RELAY_INFO:  10113,
-  NNS_MESSAGE: 27901,
+  RELAY_LIST:      10112,
+  RELAY_INFO:      10113,
+  KEYRING_PUBLIC:  17991,
+  NNS_MESSAGE:     27901,
 };
 
 export const STORAGE_KEY = {

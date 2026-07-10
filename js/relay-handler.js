@@ -14,7 +14,9 @@ export class RelayHandler {
     this._activeSubs = new Map();
   }
 
-  setWhitelist(pubkeys) { this._whitelist = new Set(pubkeys); }
+  setWhitelist(pubkeys) {
+    this._whitelist = pubkeys instanceof Set ? pubkeys : new Set(pubkeys);
+  }
 
   async handleEvent(event) {
     if (event.kind !== KIND.NNS_MESSAGE) return;

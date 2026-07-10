@@ -95,7 +95,10 @@ export function renderWhitelistEntries(root) {
       const snpub = crypto.npubEncode(sk);
       return `<div class="whitelist-subkey">
         <span class="whitelist-subkey__badge">subkey</span>
-        <span class="whitelist-entry__npub" title="${snpub}">${snpub}</span>
+        <div class="whitelist-entry__keys">
+          <span class="whitelist-entry__npub" title="${snpub}">${snpub}</span>
+          <span class="whitelist-entry__hex" title="${sk}">${sk}</span>
+        </div>
       </div>`;
     }).join('');
     return `<div class="whitelist-entry">
@@ -153,9 +156,7 @@ function wireEventExportImport(root) {
     const lines = events.map(ev => JSON.stringify(ev)).join('\n');
     const blob = new Blob([lines], { type: 'application/jsonl' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nns-events-${Date.now()}.jsonl`;
+    const a = Object.assign(document.createElement('a'), { href: url, download: `nns-events-${Date.now()}.jsonl` });
     a.click();
     URL.revokeObjectURL(url);
     toast(`Exported ${events.length} event(s)`, 'success');

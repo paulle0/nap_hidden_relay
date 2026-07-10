@@ -86,7 +86,14 @@ function renderEventsCard() {
     <div class="card" style="margin-bottom:var(--space-5)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
         <div class="section-label" style="margin:0">Relay Stored Events <span id="eventCount"></span></div>
-        <button class="btn-danger" id="btnClearEvents" style="padding:6px 12px;font-size:0.78rem">Clear all</button>
+        <div class="events-toolbar">
+          <button class="btn-ghost" id="btnExportEvents" style="padding:6px 12px;font-size:0.78rem" title="Download as .jsonl">↓ Export</button>
+          <label class="btn-ghost events-import-label" style="padding:6px 12px;font-size:0.78rem" title="Import from .jsonl">
+            ↑ Import
+            <input type="file" id="btnImportEvents" accept=".jsonl" hidden />
+          </label>
+          <button class="btn-danger" id="btnClearEvents" style="padding:6px 12px;font-size:0.78rem">Clear all</button>
+        </div>
       </div>
       <div class="event-list" id="eventList"></div>
     </div>`;

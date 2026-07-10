@@ -53,6 +53,7 @@ export function wireControls(root, sk) {
     renderEventList(root);
     log.ok('Cleared all events.');
   });
+  wireEventExportImport(root);
 }
 
 export function wireWhitelist(root) {
@@ -134,6 +135,46 @@ export async function renderEventList(root) {
       await storage.deleteEvent(btn.dataset.del);
       renderEventList(root);
     });
+  });
+}
+
+function wireEventExportImport(root) {
+  root.querySelector('#btnExportEvents').addEventListener('click', async () => {
+    const events = await storage.getAllEvents();
+    if (events.length === 0) { toast('No events to export', 'info'); return; }
+    const lines = events.map(ev => JSON.stringify(ev)).join('\n');
+    const blob = new Blob([lines], { type: 'application/jsonl' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nns-events-${Date.now()}.jsonl`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(`Exported ${events.length} event(s)`, 'success');
+  });
+  root.querySelector('#btnImportEvents').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+      let imported = 0, skipped = 0;
+      for (const line of lines) {
+        try {
+          const ev = JSON.parse(line);
+          if (!ev.id || !ev.kind) { skipped++; continue; }
+          await storage.putEvent(ev);
+          imported++;
+        } catch { skipped++; }
+      }
+      renderEventList(root);
+      toast(`Imported ${imported} event(s)${skipped ? `, ${skipped} skipped` : ''}`, 'success');
+      log.ok(`Imported ${imported} events from ${file.name}`);
+    } catch (err) {
+      toast('Import failed: ' + err.message, 'error');
+      log.err('Import failed: ' + err.message);
+    }
+    e.target.value = '';
   });
 }
 

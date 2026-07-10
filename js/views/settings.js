@@ -24,7 +24,7 @@ function renderRelaysSection() {
   return `
     <div class="settings-section">
       <h4>Rendezvous relays</h4>
-      <p>Public relays where this hidden relay listens for incoming NNS messages.</p>
+      <p>Public relays where this hidden relay listens for incoming nns messages.</p>
       <div id="settingsRelayList">
         ${state.relayUrls.map(url => relayRow(url)).join('')}
       </div>

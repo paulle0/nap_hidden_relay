@@ -156,7 +156,7 @@ function wireEventExportImport(root) {
     const lines = events.map(ev => JSON.stringify(ev)).join('\n');
     const blob = new Blob([lines], { type: 'application/jsonl' });
     const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), { href: url, download: `nns-events-${Date.now()}.jsonl` });
+    const a = Object.assign(document.createElement('a'), { href: url, download: `nrv-events-${Date.now()}.jsonl` });
     a.click();
     URL.revokeObjectURL(url);
     toast(`Exported ${events.length} event(s)`, 'success');

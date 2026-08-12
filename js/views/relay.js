@@ -3,6 +3,7 @@ import { state, subscribe } from '../state.js';
 import * as crypto from '../crypto.js';
 import * as log from '../logger.js';
 import { escapeHtml, attachCopy } from '../ui-utils.js';
+import { nrvrelayEncode, nrvUriEncode } from '../nrv-format.js';
 import { isRunning } from '../relay-engine.js';
 import { wireControls, wireWhitelist, renderWhitelistEntries, renderEventList, appendLog } from './relay-wire.js';
 
@@ -16,10 +17,12 @@ export async function renderRelay() {
   const pk = crypto.getPublicKey(sk);
   const npub = crypto.npubEncode(pk);
   let nrvrelay = '—';
-  try { nrvrelay = crypto.nrvrelayEncode(pk, state.relayUrls); } catch {}
+  let nrvUri = '—';
+  try { nrvrelay = nrvrelayEncode(pk, state.relayUrls); } catch {}
+  try { nrvUri = nrvUriEncode(pk, state.relayUrls); } catch {}
 
   root.innerHTML = `
-    ${renderIdentityCard(npub, nrvrelay)}
+    ${renderIdentityCard(npub, nrvrelay, nrvUri)}
     ${renderControlsCard()}
     ${renderWhitelistCard()}
     ${renderEventsCard()}
@@ -42,21 +45,29 @@ export async function renderRelay() {
   });
 }
 
-function renderIdentityCard(npub, nrvrelay) {
+function renderIdentityCard(npub, nrvrelay, nrvUri) {
   return `
     <div class="card" style="margin-bottom:var(--space-5)">
       <div class="section-label">Relay Identity</div>
       <div class="field">
         <label>npub</label>
-        <div class="identity-value" title="${npub}">${npub}</div>
+        <div class="identity-value" title="${escapeHtml(npub)}">${escapeHtml(npub)}</div>
       </div>
-      <div class="field">
-        <label>nrvrelay</label>
-        <div class="copy-row">
-          <div class="identity-value" style="flex:1" title="${nrvrelay}">${nrvrelay}</div>
-          <button class="copy-btn" data-copy="${escapeHtml(nrvrelay)}">Copy</button>
-        </div>
+      ${identityRow('nrvrelay', nrvrelay, 'Share this to hand someone your relay address.')}
+      ${identityRow('nostr+nrv://', nrvUri, 'Put this in an r-tag of your relay list (kind:10002) to point clients here.')}
+    </div>`;
+}
+
+function identityRow(label, value, hint) {
+  const safe = escapeHtml(value);
+  return `
+    <div class="field">
+      <label>${escapeHtml(label)}</label>
+      <div class="copy-row">
+        <div class="identity-value" style="flex:1" title="${safe}">${safe}</div>
+        <button class="copy-btn" data-copy="${safe}">Copy</button>
       </div>
+      <p class="field-hint">${escapeHtml(hint)}</p>
     </div>`;
 }
 

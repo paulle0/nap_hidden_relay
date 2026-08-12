@@ -1,8 +1,10 @@
-// js/relay-handler.js — Processes incoming kind:27901 NNS tunnel events
-import { KIND } from './config.js';
+// js/relay-handler.js — Processes incoming kind:27901 nrv tunnel events
+import { KIND, ENCRYPTION, isEphemeralKind } from './config.js';
 import * as crypto from './crypto.js';
 import * as storage from './storage.js';
 import * as log from './logger.js';
+
+const short = (pk) => `${String(pk).slice(0, 12)}…`;
 
 export class RelayHandler {
   constructor(secretKey, publishFn, onStoreUpdate) {
@@ -19,34 +21,43 @@ export class RelayHandler {
   }
 
   async handleEvent(event) {
-    if (event.kind !== KIND.NNS_MESSAGE) return;
+    if (event.kind !== KIND.NRV_MESSAGE) return;
     const sender = event.pubkey;
 
+    // Verify the signature *before* trusting event.pubkey — the whitelist
+    // gates on that field, so an unverified event makes it trivial to spoof.
+    let signatureValid = false;
+    try { signatureValid = crypto.verifyEvent(event); } catch { signatureValid = false; }
+    if (!signatureValid) {
+      log.err(`Rejected ${short(sender)} (invalid signature)`);
+      return;
+    }
+
     if (this._whitelist.size === 0) {
-      log.info(`Rejected ${sender.slice(0, 12)}… (no pubkeys whitelisted)`);
+      log.info(`Rejected ${short(sender)} (no pubkeys whitelisted)`);
       return;
     }
     if (!this._whitelist.has(sender)) {
-      log.info(`Rejected ${sender.slice(0, 12)}… (not whitelisted)`);
+      log.info(`Rejected ${short(sender)} (not whitelisted)`);
       return;
     }
 
     const encTag = event.tags.find(t => t[0] === 'encryption');
-    const encType = encTag ? encTag[1] : 'nip04';
-
-    let plaintext;
-    try {
-      if (encType === 'nip44_v2' || encType === 'nip44') {
-        plaintext = crypto.nip44Decrypt(this.sk, sender, event.content);
-      } else {
-        plaintext = await crypto.nip04Decrypt(this.sk, sender, event.content);
-      }
-    } catch (e) {
-      log.err(`Decrypt failed from ${sender.slice(0, 12)}…: ${e.message}`);
+    const encType = encTag?.[1] || ENCRYPTION;
+    if (encType !== ENCRYPTION) {
+      log.err(`Rejected ${short(sender)} (unsupported encryption "${encType}")`);
       return;
     }
 
-    log.ok(`Decrypted from ${sender.slice(0, 12)}…`);
+    let plaintext;
+    try {
+      plaintext = crypto.nip44Decrypt(this.sk, sender, event.content);
+    } catch (e) {
+      log.err(`Decrypt failed from ${short(sender)}: ${e.message}`);
+      return;
+    }
+
+    log.ok(`Decrypted from ${short(sender)}`);
     let innerMsg;
     try { innerMsg = JSON.parse(plaintext); } catch {
       log.err('Inner message is not valid JSON');
@@ -72,6 +83,15 @@ export class RelayHandler {
       await this._sendResponse(clientPubkey, ['OK', '', false, 'invalid: missing id']);
       return;
     }
+
+    // Ephemeral events are accepted but never written to storage. Without this
+    // a client could tunnel a kind:27901 back in and have it persisted.
+    if (isEphemeralKind(ev.kind)) {
+      log.info(`Accepted ephemeral kind:${ev.kind} from ${short(clientPubkey)} (not stored)`);
+      await this._sendResponse(clientPubkey, ['OK', ev.id, true, '']);
+      return;
+    }
+
     log.info(`Storing ${ev.id.slice(0, 12)}… kind:${ev.kind}`);
     try {
       await storage.putEvent(ev);
@@ -104,16 +124,17 @@ export class RelayHandler {
   }
 
   async _sendResponse(recipientPubkey, responseMsg) {
-    const plaintext = JSON.stringify(responseMsg);
     let ciphertext;
     try {
-      ciphertext = crypto.nip44Encrypt(this.sk, recipientPubkey, plaintext);
-    } catch {
-      ciphertext = await crypto.nip04Encrypt(this.sk, recipientPubkey, plaintext);
+      ciphertext = crypto.nip44Encrypt(this.sk, recipientPubkey, JSON.stringify(responseMsg));
+    } catch (e) {
+      // Never fall back to another scheme — the encryption tag must stay honest.
+      log.err(`Encrypt failed for ${short(recipientPubkey)}: ${e.message}`);
+      return;
     }
     const event = crypto.signEvent(this.sk, {
-      kind: KIND.NNS_MESSAGE,
-      tags: [['p', recipientPubkey], ['encryption', 'nip44_v2']],
+      kind: KIND.NRV_MESSAGE,
+      tags: [['p', recipientPubkey], ['encryption', ENCRYPTION]],
       content: ciphertext,
     });
     this.publish(event);

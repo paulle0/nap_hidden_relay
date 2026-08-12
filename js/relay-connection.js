@@ -1,4 +1,5 @@
 // js/relay-connection.js — WebSocket connection to a single rendezvous relay
+import { KIND } from './config.js';
 import * as log from './logger.js';
 
 export class RelayConnection {
@@ -58,8 +59,8 @@ export class RelayConnection {
   }
 
   _subscribe() {
-    this._subId = 'nns-' + Math.random().toString(36).slice(2, 10);
-    const filter = { kinds: [27901], '#p': [this._ourPubkey] };
+    this._subId = 'nrv-' + Math.random().toString(36).slice(2, 10);
+    const filter = { kinds: [KIND.NRV_MESSAGE], '#p': [this._ourPubkey] };
     this.send(['REQ', this._subId, filter]);
   }
 

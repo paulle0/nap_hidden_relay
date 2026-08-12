@@ -49,7 +49,7 @@ function init() {
 
   // Initial render
   applyView();
-  log.info('NNS Hidden Relay ready.');
+  log.info('nrv hidden relay ready.');
 }
 
 if (document.readyState === 'loading') {

@@ -89,10 +89,21 @@ export function nrvrelayDecode(str) {
 }
 
 // ——— nostr+nrv://… (wire, for r-tags) ——— //
+
+// RFC 3986 permits ':' and '/' unescaped inside a query, so relay URLs stay
+// readable. Only characters that would actually break parsing get escaped:
+// '&' (splits params), '#' (starts a fragment), '%' (ambiguous with escapes),
+// '+' (conventionally decodes to a space), plus spaces and non-ASCII.
+const KEEP_RAW = { '%3A': ':', '%2F': '/', '%3F': '?', '%40': '@', '%5B': '[', '%5D': ']', '%24': '$', '%2C': ',', '%3B': ';', '%3D': '=' };
+
+function encodeRelayParam(url) {
+  return encodeURIComponent(url).replace(/%[0-9A-F]{2}/g, m => KEEP_RAW[m] || m);
+}
+
 export function nrvUriEncode(hexPubkey, relayUrls = []) {
   const query = relayUrls
     .filter(Boolean)
-    .map(url => `relay=${encodeURIComponent(url)}`)
+    .map(url => `relay=${encodeRelayParam(url)}`)
     .join('&');
   return `${NRV_SCHEME}${assertPubkey(hexPubkey)}${query ? '?' + query : ''}`;
 }

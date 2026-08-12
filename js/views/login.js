@@ -22,7 +22,7 @@ export function renderLogin() {
       <label>Rendezvous relays</label>
       <div id="loginRelayList"></div>
       <button class="relay-add" id="loginRelayAdd" type="button">+ add relay</button>
-      <p class="field-hint">Public relays where your hidden relay listens for nns messages.</p>
+      <p class="field-hint">Public relays where your hidden relay listens for nrv messages.</p>
     </div>
     <button class="btn-primary" id="loginBtn" style="width:100%">Import &amp; start</button>`;
 
